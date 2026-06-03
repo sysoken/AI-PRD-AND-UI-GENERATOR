@@ -213,6 +213,7 @@ The frontend uses this endpoint to show inline warnings and disable Generate for
 ### 1. Backend (VPS / Docker Compose)
 - The backend is fully containerized and configured for VPS environments.
 - Refer to the private deployment guide in `docs/internal/01-architecture/20260603_hermes-deployment-handoff.md` for production VPS details (Nginx reverse proxy, Docker Compose, and Let's Encrypt SSL integration).
+- **Nginx Timeout**: Ensure Nginx `proxy_read_timeout`, `proxy_connect_timeout`, and `proxy_send_timeout` are set to at least `300s` to allow complex LLM generation calls to finish without proxy timeouts.
 - The container binds to localhost port `5000` (mapped via Docker Compose) to keep the port hidden from public internet exposure.
 
 ### 2. Frontend (Vercel)
@@ -234,6 +235,7 @@ The frontend uses this endpoint to show inline warnings and disable Generate for
 - JSON extraction is best-effort; some models may fail to produce valid JSON.
 - Only single-turn processing — no multi-step refinement.
 - No real-time streaming of responses.
+- **Cloudflare 100s Timeout**: The Cloudflare Free Plan enforces a strict 100-second HTTP response timeout. Heavy or slow models (such as Gemini 2.5 Pro or Claude 3.5 Sonnet) may occasionally exceed this limit and trigger a `504 Gateway Timeout` at the Cloudflare Edge, even if the backend is configured correctly. For production under Cloudflare Free, it is highly recommended to use fast models (like Gemini 2.5 Flash) or bypass Cloudflare's HTTP proxy (using DNS-only mode) if long-running model generations are required.
 
 ## Future Improvements
 
