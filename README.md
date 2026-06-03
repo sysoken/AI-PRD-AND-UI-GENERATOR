@@ -210,15 +210,14 @@ The frontend uses this endpoint to show inline warnings and disable Generate for
 
 ## Production Deployment
 
-### Split deployment (recommended)
+### 1. Backend (VPS / Docker Compose)
+- The backend is fully containerized and configured for VPS environments.
+- Refer to the private deployment guide in `docs/internal/01-architecture/20260603_hermes-deployment-handoff.md` for production VPS details (Nginx reverse proxy, Docker Compose, and Let's Encrypt SSL integration).
+- The container binds to localhost port `5000` (mapped via Docker Compose) to keep the port hidden from public internet exposure.
 
-- **Frontend** (`client/dist/`): Deploy static build to Vercel or Netlify.
-  - The frontend uses `import.meta.env.VITE_API_BASE_URL` to connect to the backend.
-  - Set `VITE_API_BASE_URL` in your hosting dashboard (e.g. `https://your-api.onrender.com`).
-- **Backend**: Deploy to Render, Railway, or any Node.js host.
-  - Set all `*_API_KEY` environment variables in the platform dashboard.
-  - Enable CORS for your frontend origin.
-  - The server binds to `process.env.PORT` (defaults to `5000`).
+### 2. Frontend (Vercel)
+- Deploy static build (`client/dist/`) to Vercel or any static host.
+- Set the environment variable `VITE_API_BASE_URL` (e.g. `https://api-prd-aigen.ruangsya.my.id`) in the hosting provider's dashboard.
 
 ## Assumptions
 
@@ -236,7 +235,15 @@ The frontend uses this endpoint to show inline warnings and disable Generate for
 - Only single-turn processing — no multi-step refinement.
 - No real-time streaming of responses.
 
+## Future Improvements
+
+- **Persistent Storage**: Save generated PRDs and wireframes to a database (e.g., MongoDB, PostgreSQL) with user accounts.
+- **Interactive Refinement**: Allow users to chat with the LLM to refine the generated artifacts (multi-turn conversations).
+- **Exporting Options**: Download PRDs as PDF or Markdown and export HTML wireframes to custom styling templates.
+- **Real-Time Streaming**: Stream the LLM response chunk-by-chunk to improve perceived response times.
+
 ## Documentation
 
-- **Internal Planning**: Private planning and design docs live in `docs/internal/` and are excluded from version control via `.gitignore`.
+- **Internal Planning**: Private planning, design docs, and server deployment notes live in `docs/internal/` and are excluded from version control via `.gitignore`.
 - **Public Guides**: User guides, such as the [Sample Transcripts](file:///D:/Luar/AI%20Product%20Requirement%20&%20UI%20Generator/docs/public/01-guide/20260603_sample-transcripts.md), live in `docs/public/01-guide/`.
+
